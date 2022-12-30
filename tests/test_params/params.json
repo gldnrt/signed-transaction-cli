@@ -1,0 +1,7 @@
+{
+    "utx": {
+        "txid": "value-of-txid",
+        "vout": "value-of-vout",
+        "scriptPubKey_hex": "value-of-scriptPubKey_hex"
+    }
+}
