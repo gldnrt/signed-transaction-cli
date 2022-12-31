@@ -34,6 +34,7 @@ class TestTransaction:
         dest_address = dest_address.replace("\n", "")
 
         params = {
+            "network": "regtest",
             "unspent_tx": {"txid": txid, "vout": vout},
             "amount": amount,
             "dest_address": dest_address,
