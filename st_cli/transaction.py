@@ -3,11 +3,25 @@ import json
 
 
 class Transaction:
+    """トランザクションを扱うクラス"""
+
     params = None
+    network_arg = "-unspecified-network"
 
     def __init__(self, params) -> None:
         """params: 入力パラメータ"""
         self.params = params
+
+        # インジェクション攻撃防止のため判定処理をする
+        if "regtest" == params["network"]:
+            self.network_arg = "-regtest"
+        elif "testnet" == params["network"]:
+            self.network_arg = "-testnet"
+        elif "mainnet" == params["network"]:
+            # 動作確認対象外
+            self.network_arg = "-mainnet"
+        else:
+            raise RuntimeError('Error: "network" parameter is invalid')
 
     def __run_shell_command(self, command) -> str:
         """コマンドを実行し、標準出力結果を返す"""
@@ -15,7 +29,7 @@ class Transaction:
         try:
             result = subprocess.run(
                 command,
-                shell=True,
+                shell=True,  # TODO: インジェクション攻撃防止のためfalseにする
                 capture_output=True,
                 text=True,
                 check=True,
@@ -39,7 +53,9 @@ class Transaction:
         outputs = {self.params["dest_address"]: self.params["amount"]}
 
         cmd_createrawtransaction = (
-            "bitcoin-cli -regtest createrawtransaction '"
+            "bitcoin-cli "
+            + self.network_arg
+            + " createrawtransaction '"
             + json.dumps(inputs)
             + "' '"
             + json.dumps(outputs)
@@ -57,7 +73,12 @@ class Transaction:
         前提としてwalletがloadされていること
         """
 
-        cmd = "bitcoin-cli -regtest signrawtransactionwithwallet " + raw_tx
+        cmd = (
+            "bitcoin-cli "
+            + self.network_arg
+            + " signrawtransactionwithwallet "
+            + raw_tx
+        )
         signed_result = self.__run_shell_command_json(cmd)
         if signed_result["complete"] is not True:
             raise RuntimeError("Error, sign raw_tx failed")
