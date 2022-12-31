@@ -3,6 +3,8 @@ from . import cli
 
 
 def main():
+    """cli.create_signed_transactionの実行およびエラー処理"""
+
     try:
         cli.create_signed_transaction(sys.argv)
     except Exception as e:
