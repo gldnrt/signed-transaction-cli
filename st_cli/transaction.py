@@ -29,7 +29,7 @@ class Transaction:
         try:
             result = subprocess.run(
                 command,
-                shell=True,  # TODO: インジェクション攻撃防止のためfalseにする
+                shell=False,
                 capture_output=True,
                 text=True,
                 check=True,
@@ -49,18 +49,20 @@ class Transaction:
     def create_raw_tx(self) -> str:
         """送金用のRaw Transactionを作成する"""
 
-        inputs = [self.params["unspent_tx"]]
-        outputs = {self.params["dest_address"]: self.params["amount"]}
+        inputs = [self.params["unspent_transaction"]]
 
-        cmd_createrawtransaction = (
-            "bitcoin-cli "
-            + self.network_arg
-            + " createrawtransaction '"
-            + json.dumps(inputs)
-            + "' '"
-            + json.dumps(outputs)
-            + "'"
-        )
+        remittance_amount = self.params["remittance_amount"]
+        outputs = {
+            self.params["address"]["destination"]: remittance_amount
+        }
+
+        cmd_createrawtransaction = [
+            "bitcoin-cli",
+            self.network_arg,
+            "createrawtransaction",
+            json.dumps(inputs),
+            json.dumps(outputs)
+        ]
 
         raw_tx = self.__run_shell_command(cmd_createrawtransaction)
         raw_tx = raw_tx.replace("\n", "")
@@ -73,13 +75,14 @@ class Transaction:
         前提としてwalletがloadされていること
         """
 
-        cmd = (
-            "bitcoin-cli "
-            + self.network_arg
-            + " signrawtransactionwithwallet "
-            + raw_tx
-        )
-        signed_result = self.__run_shell_command_json(cmd)
+        signe_cmd = [
+            "bitcoin-cli",
+            self.network_arg,
+            "signrawtransactionwithwallet",
+            raw_tx
+            ]
+                
+        signed_result = self.__run_shell_command_json(signe_cmd)
         if signed_result["complete"] is not True:
             raise RuntimeError("Error, sign raw_tx failed")
 

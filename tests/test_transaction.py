@@ -33,11 +33,18 @@ class TestTransaction:
         dest_address = self.run_command(cmd)
         dest_address = dest_address.replace("\n", "")
 
+        cmd = 'bitcoin-cli -regtest getnewaddress "Sender Charge Address"'
+        sender_charge_address = self.run_command(cmd)
+        sender_charge_address = sender_charge_address.replace("\n", "")
+
         params = {
             "network": "regtest",
-            "unspent_tx": {"txid": txid, "vout": vout},
-            "amount": amount,
-            "dest_address": dest_address,
+            "remittance_amount": amount,
+            "unspent_transaction": {"txid": txid, "vout": vout},
+            "address": {
+                "destination": dest_address,
+                "sender_charge": sender_charge_address
+            }
         }
 
         # 実行
