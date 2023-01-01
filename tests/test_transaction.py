@@ -25,9 +25,6 @@ class TestTransaction:
 
         # 入力パラメータparams作成
         listunspent = self.run_command_json("bitcoin-cli -regtest listunspent")
-        vout = listunspent[0]["vout"]
-        txid = listunspent[0]["txid"]
-        amount = listunspent[0]["amount"] - 0.0001
 
         cmd = 'bitcoin-cli -regtest getnewaddress "Dest Address"'
         dest_address = self.run_command(cmd)
@@ -37,20 +34,32 @@ class TestTransaction:
         sender_charge_address = self.run_command(cmd)
         sender_charge_address = sender_charge_address.replace("\n", "")
 
+        remittance_amount = listunspent[0]["amount"]/4
+
         params = {
             "network": "regtest",
-            "remittance_amount": amount,
-            "unspent_transaction": {"txid": txid, "vout": vout},
+            "remittance_amount": remittance_amount,
+            "transaction_fee": 0.00001,
+            "unspent_transaction": {
+                "txid": listunspent[0]["txid"],
+                "vout": listunspent[0]["vout"],
+                "value": listunspent[0]["amount"]
+                },
             "address": {
                 "destination": dest_address,
                 "sender_charge": sender_charge_address
             }
         }
 
+        # 浮動小数点を小数点以下8桁に丸める
+        params = json.loads(
+            json.dumps(params),
+            parse_float=lambda x: round(float(x), 8))
+
         # 実行
         myTransaction = Transaction(params)
         signed_tx = myTransaction.create_signed_tx()
 
-        # ブロードキャストして確認 - 失敗時は例外がスローされる
+        # ブロードキャストして確認 - 失敗時は例外がスローされてテスト失敗
         cmd = "bitcoin-cli -regtest sendrawtransaction " + signed_tx
         self.run_command(cmd)

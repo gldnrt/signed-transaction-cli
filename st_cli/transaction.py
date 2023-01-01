@@ -1,5 +1,6 @@
 import subprocess
 import json
+import sys
 
 
 class Transaction:
@@ -25,18 +26,16 @@ class Transaction:
 
     def __run_shell_command(self, command) -> str:
         """コマンドを実行し、標準出力結果を返す"""
-
-        try:
-            result = subprocess.run(
-                command,
-                shell=False,
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-        except Exception:
-            # TODO: 引数にerr_messageを追加し、以下のメッセージに表示する
-            raise RuntimeError("Error, command execution failed, " + command)
+        result = subprocess.run(
+            command,
+            shell=False,
+            capture_output=True,
+            text=True,
+        )
+        
+        if 0 != result.returncode:
+            sys.stderr.write(result.stderr)
+            raise RuntimeError("Error, command failed, " + " ".join(command))
 
         return result.stdout
 
@@ -49,19 +48,32 @@ class Transaction:
     def create_raw_tx(self) -> str:
         """送金用のRaw Transactionを作成する"""
 
-        inputs = [self.params["unspent_transaction"]]
+        tx_inputs = [
+            {
+                "txid": self.params["unspent_transaction"]["txid"],
+                "vout": self.params["unspent_transaction"]["vout"]
+            }
+        ]
 
         remittance_amount = self.params["remittance_amount"]
-        outputs = {
-            self.params["address"]["destination"]: remittance_amount
+        charge = self.params["unspent_transaction"]["value"] \
+            - remittance_amount - self.params["transaction_fee"]
+        # 小数点以下8桁に丸める
+        charge = json.loads(
+            json.dumps(charge),
+            parse_float=lambda x: round(float(x), 8))
+
+        tx_outputs = {
+            self.params["address"]["destination"]: remittance_amount,
+            self.params["address"]["sender_charge"]: charge
         }
 
         cmd_createrawtransaction = [
             "bitcoin-cli",
             self.network_arg,
             "createrawtransaction",
-            json.dumps(inputs),
-            json.dumps(outputs)
+            json.dumps(tx_inputs),
+            json.dumps(tx_outputs)
         ]
 
         raw_tx = self.__run_shell_command(cmd_createrawtransaction)
