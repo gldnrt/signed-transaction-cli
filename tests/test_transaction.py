@@ -30,6 +30,7 @@ class TestTransaction:
     def __create_default_params(self) -> object:
         '''
         デフォルトの試験用入力パラメータを作成
+        前提: listunspent[0]に十分な(fee以上の)valueがあること
         '''
 
         cmd = 'bitcoin-cli -regtest getnewaddress "Dest Address"'
@@ -44,7 +45,7 @@ class TestTransaction:
             "bitcoin-cli -regtest listunspent"
             )
 
-        target_utx = listunspent[-1]
+        target_utx = listunspent[0]
         remittance_amount = target_utx["amount"]/4
 
         params = {
@@ -116,7 +117,30 @@ class TestTransaction:
         raw_tx = myTx.create_raw_tx()
 
         assert re.match(r"^[0-9a-f]+$", raw_tx)
-        
+
+        # 結果をdecodeして確認する
+        cmd = "bitcoin-cli -regtest decoderawtransaction " + raw_tx
+        decoded_raw_tx = json.loads(self.__run_command(cmd))
+        print(decoded_raw_tx)
+
+        assert len(decoded_raw_tx["vin"]) == 1
+        assert decoded_raw_tx["vin"][0]["txid"]\
+            == params["unspent_transaction"]["txid"]
+        assert decoded_raw_tx["vin"][0]["vout"]\
+            == params["unspent_transaction"]["vout"]
+
+        assert len(decoded_raw_tx["vout"]) == 2
+        assert decoded_raw_tx["vout"][0]["value"]\
+            == params["remittance_amount"]
+        assert decoded_raw_tx["vout"][0]["scriptPubKey"]["address"]\
+            == params["address"]["destination"]
+        assert decoded_raw_tx["vout"][1]["value"]\
+            == (params["unspent_transaction"]["value"]
+                - params["remittance_amount"]
+                - params["transaction_fee"])
+        assert decoded_raw_tx["vout"][1]["scriptPubKey"]["address"]\
+            == params["address"]["sender_charge"]
+
     def test_create_raw_tx_ignore_param(self):
         params = self.__create_default_params()
         params['unspent_transaction']['txid'] = 'ignore_txid'
