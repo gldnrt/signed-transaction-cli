@@ -12,7 +12,7 @@ class TestTransaction:
     '''
 
     @classmethod
-    def __run_command(self, command) -> str:
+    def __run_command(cls, command) -> str:
         '''シェルコマンド実行後、標準出力を返す'''
 
         proc = subprocess.run(
