@@ -1,7 +1,6 @@
+import sys
 from .params import get_params
 from .transaction import Transaction
-
-
 
 
 def get_params_file_path(argv: list[str]) -> str:
@@ -22,3 +21,13 @@ def create_signed_transaction(argv: list[str]) -> None:
     myTransaction = Transaction(params)
     signed_tx = myTransaction.create_signed_tx()
     print(signed_tx)
+
+
+def cli_main(argv: list[str]) -> None:
+    """create_signed_transactionの実行およびエラー処理"""
+
+    try:
+        create_signed_transaction(sys.argv)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        exit(1)

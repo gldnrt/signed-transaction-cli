@@ -1,15 +1,10 @@
-import sys
 from . import cli
 
 
 def main() -> None:
-    """cli.create_signed_transactionの実行およびエラー処理"""
+    """cli.main()を呼び出す"""
 
-    try:
-        cli.create_signed_transaction(sys.argv)
-    except Exception as e:
-        print(e, file=sys.stderr)
-        exit(1)
+    cli.main()
 
 
 if __name__ == "__main__":

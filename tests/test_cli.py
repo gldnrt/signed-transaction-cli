@@ -1,5 +1,5 @@
 import pytest
-from st_cli.cli import get_params_file_path
+from st_cli.cli import get_params_file_path, cli_main
 
 
 class TestGetParamsFilePath:
@@ -35,3 +35,16 @@ class TestGetParamsFilePath:
             get_params_file_path(argv)
 
         assert str(e.value) == "Usage: st_cli [FILE_PATH]"
+
+
+class TestCliMain:
+    '''cli_main()のテスト'''
+
+    def test_exit_code(self, capfd):
+        with pytest.raises(SystemExit) as e:
+            cli_main(["./signed-transaction-cli/st_cli/__main__.py"])
+
+        out, err = capfd.readouterr()
+        assert out == ""
+        assert err == "Usage: st_cli [FILE_PATH]\n"
+        assert e.value.code == 1
