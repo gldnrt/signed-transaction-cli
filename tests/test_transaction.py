@@ -52,7 +52,7 @@ class TestTransaction:
             "network": "regtest",
             "remittance_amount": remittance_amount,
             "transaction_fee": 0.00001,
-            "unspent_transaction": {
+            "specified_utxo": {
                 "txid": target_utx["txid"],
                 "vout": target_utx["vout"],
                 "amount": target_utx["amount"]
@@ -125,9 +125,9 @@ class TestTransaction:
 
         assert len(decoded_raw_tx["vin"]) == 1
         assert decoded_raw_tx["vin"][0]["txid"]\
-            == params["unspent_transaction"]["txid"]
+            == params["specified_utxo"]["txid"]
         assert decoded_raw_tx["vin"][0]["vout"]\
-            == params["unspent_transaction"]["vout"]
+            == params["specified_utxo"]["vout"]
 
         assert len(decoded_raw_tx["vout"]) == 2
         assert decoded_raw_tx["vout"][0]["value"]\
@@ -135,7 +135,7 @@ class TestTransaction:
         assert decoded_raw_tx["vout"][0]["scriptPubKey"]["address"]\
             == params["address"]["destination"]
         assert decoded_raw_tx["vout"][1]["value"]\
-            == (params["unspent_transaction"]["amount"]
+            == (params["specified_utxo"]["amount"]
                 - params["remittance_amount"]
                 - params["transaction_fee"])
         assert decoded_raw_tx["vout"][1]["scriptPubKey"]["address"]\
@@ -143,7 +143,7 @@ class TestTransaction:
 
     def test_create_raw_tx_ignore_param(self):
         params = self.__create_default_params()
-        params['unspent_transaction']['txid'] = 'ignore_txid'
+        params['specified_utxo']['txid'] = 'ignore_txid'
         myTx = Transaction(params)
 
         with pytest.raises(RuntimeError):

@@ -70,13 +70,13 @@ class Transaction:
 
         tx_inputs = [
             {
-                "txid": self.params["unspent_transaction"]["txid"],
-                "vout": self.params["unspent_transaction"]["vout"]
+                "txid": self.params["specified_utxo"]["txid"],
+                "vout": self.params["specified_utxo"]["vout"]
             }
         ]
 
         remittance_amount = self.params["remittance_amount"]
-        charge = self.params["unspent_transaction"]["amount"] \
+        charge = self.params["specified_utxo"]["amount"] \
             - remittance_amount - self.params["transaction_fee"]
         charge = self.__modify_float_notation_for_json(charge)
 

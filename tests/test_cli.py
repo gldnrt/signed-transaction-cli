@@ -70,7 +70,7 @@ class TestCheckParams:
                 "network": "regtest",
                 "remittance_amount": 0.0,
                 "transaction_fee": 0.00000,
-                "unspent_transaction": {
+                "specified_utxo": {
                     "txid": "09af",
                     "vout": 0,
                     "amount": 0
@@ -117,13 +117,13 @@ class TestCheckParams:
     # 無効となるキーと値を
     # (parentkey, key, value)形式のリストにする
     ignore_nestedkey_value = [
-        ("unspent_transaction", "txid", 0),
-        ("unspent_transaction", "txid", "g"),
-        ("unspent_transaction", "txid", "0g"),
-        ("unspent_transaction", "txid", "A"),
-        ("unspent_transaction", "vout", -1),
-        ("unspent_transaction", "vout", 0.1),
-        ("unspent_transaction", "vout", "0"),
+        ("specified_utxo", "txid", 0),
+        ("specified_utxo", "txid", "g"),
+        ("specified_utxo", "txid", "0g"),
+        ("specified_utxo", "txid", "A"),
+        ("specified_utxo", "vout", -1),
+        ("specified_utxo", "vout", 0.1),
+        ("specified_utxo", "vout", "0"),
         ("address", "destination", 0),
         ("address", "destination", ")"),
         ("address", "destination", "0)"),

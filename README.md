@@ -35,7 +35,7 @@ $ poetry intall
     "network": "接続先をregtest|testnet|mainnetから選択",
     "remittance_amount": 送金量,
     "transaction_fee": トランザクションfeeの量を指定,
-    "unspent_transaction": {
+    "specified_utxo": {
         "txid": "送金に使用するUTXOのtxidを指定",
         "vout": 送金に使用するUTXOのvoutを指定,
         "amount": 送金に使用するUTXOのamountを指定
