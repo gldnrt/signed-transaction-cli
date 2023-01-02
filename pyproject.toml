@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "st-cli"
 version = "0.1.0"
-description = ""
+description = "Bitcoinの署名済み送金用トランザクションを作成するCLIアプリケーション"
 authors = ["gldnrt <19574992+gldnrt@users.noreply.github.com>"]
 readme = "README.md"
 packages = [{include = "st_cli"}]
