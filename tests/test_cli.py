@@ -66,6 +66,8 @@ class TestCheckParams:
     '''check_paramsテストクラス'''
 
     def create_default_params(self) -> str:
+        '''正常値のpaarm作成'''
+        
         params = {
                 "network": "regtest",
                 "remittance_amount": 0.0,
@@ -141,4 +143,3 @@ class TestCheckParams:
             check_params(params)
 
         print(e)
-

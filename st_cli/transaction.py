@@ -52,7 +52,7 @@ class Transaction:
 
     def __modify_float_notation_for_json(
             self, num: float, digits: int = 8
-            ) -> object:
+            ) -> float:
         '''
         json dump後の小数点以下の浮動小数点表記を、指定桁に丸める
         - 浮動小数点をjson dumpすると、誤差により小数点の桁数が大きくなる問題の修正

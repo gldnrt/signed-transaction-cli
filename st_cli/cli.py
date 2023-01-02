@@ -5,8 +5,12 @@ from .transaction import Transaction
 
 
 def check_params(params: object) -> None:
+    '''入力paramがスキーマに即しているかを確認する'''
+
     parentdir = os.path.dirname(__file__)
-    with open(parentdir + '/schema.json') as file_obj:
+    schema_file_path = parentdir + '/schema.json'
+
+    with open(schema_file_path) as file_obj:
         json_schema = json.load(file_obj)
 
     try:
@@ -17,7 +21,7 @@ def check_params(params: object) -> None:
     return
 
 
-def get_params(argv) -> object:
+def get_params(argv: list[str]) -> object:
     """第1引数に指定されたjsonパラメータファイルを読み込む"""
 
     if 2 != len(argv):
@@ -32,7 +36,7 @@ def get_params(argv) -> object:
     return params
 
 
-def create_signed_transaction(argv) -> None:
+def create_signed_transaction(argv: list[str]) -> None:
     """オフラインで署名済み送金用トランザクションを作成する"""
 
     params = get_params(argv)

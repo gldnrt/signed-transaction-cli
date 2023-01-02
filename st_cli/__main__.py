@@ -2,7 +2,7 @@ import sys
 from . import cli
 
 
-def main():
+def main() -> None:
     """cli.create_signed_transactionの実行およびエラー処理"""
 
     try:
