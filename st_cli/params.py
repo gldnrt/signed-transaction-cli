@@ -32,7 +32,7 @@ def read_params_from_file(param_file_path: str) -> dict:
     return params
 
 
-def get_params(param_file_path: str) -> object:
+def get_params(param_file_path: str) -> dict:
     '''指定されたファイルからパラメータを取得する'''
 
     params = read_params_from_file(param_file_path)

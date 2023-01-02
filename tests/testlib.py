@@ -1,5 +1,6 @@
 import json
 import subprocess
+import os
 
 
 def run_command(command) -> str:
@@ -12,14 +13,14 @@ def run_command(command) -> str:
     return proc.stdout
 
 
-def run_command_json(command) -> object:
-    '''シェルコマンド実行後、標準出力をjsonに変換して返す'''
+def run_command_json(command) -> dict:
+    '''シェルコマンド実行後、標準出力をdictに変換して返す'''
 
     result = run_command(command)
     return json.loads(result)
 
 
-def create_default_params() -> object:
+def create_default_params() -> dict:
     '''
     デフォルトの試験用入力パラメータを作成
     前提: listunspent[0]に十分な(fee以上の)amountがあること
@@ -61,3 +62,25 @@ def create_default_params() -> object:
         parse_float=lambda x: round(float(x), 8))
 
     return params
+
+
+def get_default_input_file_path():
+    '''デフォルトの入力ファイルのパスを返す'''
+    input_file_path = "./tests/test_params/auto_created_test_params.json"
+    
+    return input_file_path
+
+
+def create_input_file(params: dict, path: str = get_default_input_file_path()):
+    '''paramsをファイル出力する'''
+
+    with open(path, 'w') as fout:
+        json.dump(params, fout, indent=2)
+
+    os.sync()
+
+
+def delete_input_file(path: str = get_default_input_file_path()):
+    '''pathのファイルを削除する'''
+    os.remove(path)
+    os.sync()

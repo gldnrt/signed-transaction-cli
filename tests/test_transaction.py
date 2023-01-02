@@ -11,14 +11,6 @@ class TestTransaction:
     前提: walletがロードされていること
     '''
 
-    def setup_class(cls):
-        # 送金用コイン生成
-        cmd = (
-            "bitcoin-cli -regtest generatetoaddress 101 "
-            + '$(bitcoin-cli -regtest getnewaddress "sender")'
-        )
-        testlib.run_command(cmd)
-
     def test_constructor_regtest(self):
         params = {"network": "regtest"}
 
