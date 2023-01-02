@@ -13,19 +13,7 @@ class Transaction:
         """params: 入力パラメータ"""
 
         self.params = params
-
-        # インジェクション攻撃防止のため判定処理をする
-        if "regtest" == params["network"]:
-            self.network_arg = "-regtest"
-        elif "testnet" == params["network"]:
-            self.network_arg = "-testnet"
-        elif "mainnet" == params["network"]:
-            # 動作確認対象外
-            self.network_arg = "-mainnet"
-        else:
-            raise RuntimeError(
-                'Error: "network" parameter is invalid, ' + params["network"]
-                )
+        self.network_arg = "-" + params["network"]
 
     def __run_shell_command(self, command_elements: list[str]) -> str:
         """コマンドを実行し、標準出力結果を返す"""
@@ -52,7 +40,7 @@ class Transaction:
 
     def __modify_float_notation_for_json(
             self, num: float, digits: int = 8
-            ) -> object:
+            ) -> float:
         '''
         json dump後の小数点以下の浮動小数点表記を、指定桁に丸める
         - 浮動小数点をjson dumpすると、誤差により小数点の桁数が大きくなる問題の修正
@@ -70,13 +58,13 @@ class Transaction:
 
         tx_inputs = [
             {
-                "txid": self.params["unspent_transaction"]["txid"],
-                "vout": self.params["unspent_transaction"]["vout"]
+                "txid": self.params["specified_utxo"]["txid"],
+                "vout": self.params["specified_utxo"]["vout"]
             }
         ]
 
         remittance_amount = self.params["remittance_amount"]
-        charge = self.params["unspent_transaction"]["amount"] \
+        charge = self.params["specified_utxo"]["amount"] \
             - remittance_amount - self.params["transaction_fee"]
         charge = self.__modify_float_notation_for_json(charge)
 

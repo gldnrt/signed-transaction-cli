@@ -1,144 +1,50 @@
 import pytest
-from st_cli.cli import get_params, check_params
+from st_cli.cli import get_params_file_path, cli_main
 
 
-def test_read_params():
-    argv = [
-        "./signed-transaction-cli/st_cli/__main__.py",
-        "./tests/test_params/params.json",
-    ]
-    params = get_params(argv)
+class TestGetParamsFilePath:
+    '''get_params_file_path()のテスト'''
 
-    assert params["utx"]["txid"] == "value-of-txid"
-    assert params["utx"]["vout"] == "value-of-vout"
-    assert params["utx"]["scriptPubKey_hex"] == "value-of-scriptPubKey_hex"
+    def test_normal_case(self):
+        argv = [
+            "./signed-transaction-cli/st_cli/__main__.py",
+            "./tests/test_params/params.json",
+        ]
 
+        file_path = get_params_file_path(argv)
+        assert file_path == "./tests/test_params/params.json"
 
-def test_no_args():
-    argv = [
-        "./signed-transaction-cli/st_cli/__main__.py",
-    ]
+    def test_no_args(self):
+        argv = [
+            "./signed-transaction-cli/st_cli/__main__.py",
+        ]
 
-    with pytest.raises(ReferenceError) as e:
-        get_params(argv)
+        with pytest.raises(ReferenceError) as e:
+            get_params_file_path(argv)
 
-    assert str(e.value) == "Usage: st_cli [FILE_PATH]"
+        assert str(e.value) == "Usage: st_cli [FILE_PATH]"
 
+    def test_too_many_args(self):
+        argv = [
+            "./signed-transaction-cli/st_cli/__main__.py",
+            "./tests/test_params/params.json",
+            "./tests/test_params/params.json",
+        ]
 
-def test_too_many_args():
-    argv = [
-        "./signed-transaction-cli/st_cli/__main__.py",
-        "./tests/test_params/params.json",
-        "./tests/test_params/params.json",
-    ]
+        with pytest.raises(ReferenceError) as e:
+            get_params_file_path(argv)
 
-    with pytest.raises(ReferenceError) as e:
-        get_params(argv)
-
-    assert str(e.value) == "Usage: st_cli [FILE_PATH]"
-
-
-def test_no_existed_file():
-    argv = [
-        "./signed-transaction-cli/st_cli/__main__.py",
-        "./no_existed.json",
-    ]
-
-    with pytest.raises(ReferenceError) as e:
-        get_params(argv)
-
-    assert str(e.value).startswith("Error: ignore params file,")
+        assert str(e.value) == "Usage: st_cli [FILE_PATH]"
 
 
-def test_incorrect_json():
-    argv = [
-        "./signed-transaction-cli/st_cli/__main__.py",
-        "./tests/test_params/incorrect.json",
-    ]
+class TestCliMain:
+    '''cli_main()のテスト'''
 
-    with pytest.raises(ReferenceError) as e:
-        get_params(argv)
+    def test_exit_code(self, capfd):
+        with pytest.raises(SystemExit) as e:
+            cli_main(["./signed-transaction-cli/st_cli/__main__.py"])
 
-    assert str(e.value).startswith("Error: ignore params file, ")
-
-
-class TestCheckParams:
-    '''check_paramsテストクラス'''
-
-    def create_default_params(self) -> str:
-        params = {
-                "network": "regtest",
-                "remittance_amount": 0.0,
-                "transaction_fee": 0.00000,
-                "unspent_transaction": {
-                    "txid": "09af",
-                    "vout": 0,
-                    "amount": 0
-                },
-                "address": {
-                    "destination": "azAZ09",
-                    "sender_charge": "90ZAza"
-                }
-            }
-        return params
-
-    def test_check_params(self):
-        params = self.create_default_params()
-        check_params(params)
-
-    @pytest.mark.parametrize("network", ["regtest", "testnet", "mainnet"])
-    def test_check_params_network(self, network):
-        params = self.create_default_params()
-        params["network"] = network
-
-        check_params(params)
-
-    # "params[key]: value"で指定できる値で、
-    # 無効となるキーと値を
-    # (key, value)形式のリストにする
-    ignore_key_value = [
-        ("network", 1),
-        ("network", "ignore"),
-        ("remittance_amount", -1),
-        ("remittance_amount", "0"),
-        ("transaction_fee", -1),
-        ("transaction_fee", "0"),
-    ]
-
-    @pytest.mark.parametrize("key, value", ignore_key_value)
-    def test_check_params_ignore_value(self, key, value):
-        params = self.create_default_params()
-        params[key] = value
-
-        with pytest.raises(RuntimeError):
-            check_params(params)
-
-    # "params[parentkey][key]: value"で指定できる値で、
-    # 無効となるキーと値を
-    # (parentkey, key, value)形式のリストにする
-    ignore_nestedkey_value = [
-        ("unspent_transaction", "txid", 0),
-        ("unspent_transaction", "txid", "g"),
-        ("unspent_transaction", "txid", "0g"),
-        ("unspent_transaction", "txid", "A"),
-        ("unspent_transaction", "vout", -1),
-        ("unspent_transaction", "vout", 0.1),
-        ("unspent_transaction", "vout", "0"),
-        ("address", "destination", 0),
-        ("address", "destination", ")"),
-        ("address", "destination", "0)"),
-        ("address", "sender_charge", 0),
-        ("address", "sender_charge", ")"),
-        ("address", "sender_charge", "0)"),
-    ]
-
-    @pytest.mark.parametrize("parentkey, key, value", ignore_nestedkey_value)
-    def test_check_params_ignore_value_nested_key(self, parentkey, key, value):
-        params = self.create_default_params()
-        params[parentkey][key] = value
-
-        with pytest.raises(RuntimeError) as e:
-            check_params(params)
-
-        print(e)
-
+        out, err = capfd.readouterr()
+        assert out == ""
+        assert err == "Usage: st_cli [FILE_PATH]\n"
+        assert e.value.code == 1

@@ -1,6 +1,6 @@
 {
     "network": "regtest",
-    "remittance_amount": 0.00008047,
+    "remittance_amount": -0.00008047,
     "transaction_fee": 0.00001,
     "specified_utxo": {
         "txid": "81e0c94f6f0bf1d303a7ffc6f9f66102bb55980e74a44ea5e27b061bbc844bbe",

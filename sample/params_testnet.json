@@ -2,7 +2,7 @@
     "network": "testnet",
     "remittance_amount": 0.00001234,
     "transaction_fee": 0.00001,
-    "unspent_transaction": {
+    "specified_utxo": {
         "txid": "f480cd7507ac6a527ac9656050d600fb5053d9cd34666515090151d6d1b1fc9c",
         "vout": 0,
         "amount": 0.00008047
