@@ -42,6 +42,16 @@ class TestGetParamsFilePath:
 class TestCliMain:
     '''
     cli_main()のテスト
+
+    結合テストケース
+    ・正常系: test_normal_case()
+    ・引数エラー: test_error_occurred()
+    ・設定ファイルがjson形式でない: test_input_file_not_json()
+    ・設定ファイルが存在しない: test_input_file_not_exist()
+    ・入力ファイルのValidation: test_check_input_file_schema()
+        個々の項目はTestCheckParamsで行っているため省略
+    ・異常値を含む入力ファイル
+        - 無効なtxid: TestCliMain.test_ignore_txid()
     '''
 
     def test_normal_case(self, capfd):
@@ -67,6 +77,64 @@ class TestCliMain:
         out, err = capfd.readouterr()
         assert out == ""
         assert err == "Usage: st_cli [FILE_PATH]\n"
+        assert e.value.code == 1
+
+    def test_input_file_not_json(self, capfd):
+        with pytest.raises(SystemExit) as e:
+            cli.cli_main([
+                "./st_cli/__main__.py",
+                "./tests/test_params/incorrect.json_"
+            ])
+            
+        out, err = capfd.readouterr()
+        assert out == ""
+        assert err.startswith("Error: ignore params file,")
+        assert e.value.code == 1
+
+    def test_input_file_not_exist(self, capfd):
+        with pytest.raises(SystemExit) as e:
+            cli.cli_main([
+                "./st_cli/__main__.py",
+                "./tests/test_params/not/exist/param.json"
+            ])
+            
+        out, err = capfd.readouterr()
+        assert out == ""
+        assert err.startswith("Error: ignore params file,")
+        assert e.value.code == 1
+
+    def test_check_input_file_schema(self, capfd):
+        params = testlib.create_default_params()
+        params['remittance_amount'] = -0.1
+
+        testlib.create_input_file(params)
+
+        path = testlib.get_default_input_file_path()
+        args = ["./st_cli/__main__.py", path]
+
+        with pytest.raises(SystemExit) as e:
+            cli.cli_main(args)
+
+        out, err = capfd.readouterr()
+        assert out == ""
+        assert err.startswith("Error: ignore params file,")
+        assert e.value.code == 1
+
+    def test_ignore_txid(self, capfd):
+        params = testlib.create_default_params()
+        params['specified_utxo']['txid'] = "0" * 64
+
+        testlib.create_input_file(params)
+
+        path = testlib.get_default_input_file_path()
+        args = ["./st_cli/__main__.py", path]
+
+        with pytest.raises(SystemExit) as e:
+            cli.cli_main(args)
+
+        out, err = capfd.readouterr()
+        assert out == ""
+        assert err.startswith("Error, sign raw transaction is not complete")
         assert e.value.code == 1
 
 
