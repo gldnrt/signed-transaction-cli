@@ -32,7 +32,7 @@
             "required": [
                 "txid",
                 "vout",
-                "value"
+                "amount"
             ],
             "properties": {
                 "txid": {
@@ -43,7 +43,7 @@
                     "type": "integer",
                     "minimum": 0
                 },
-                "value": {
+                "amount": {
                     "type": "number",
                     "minimum": 0
                 }
@@ -75,7 +75,7 @@
             "unspent_transaction": {
                 "txid": "81e0c94f6f0bf1d303a7ffc6f9f66102bb55980e74a44ea5e27b061bbc844bbe",
                 "vout": 0,
-                "value": 0.2
+                "amount": 0.2
             },
             "address": {
                 "destination": "bcrt1qem508a5wudkwuc2a0pwtk5y5ldzzlzzhy7tpn2",
