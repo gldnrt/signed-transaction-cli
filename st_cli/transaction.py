@@ -1,5 +1,6 @@
 import subprocess
 import json
+import sys
 
 
 class Transaction:
@@ -8,8 +9,9 @@ class Transaction:
     params = None
     network_arg = "-unspecified-network"
 
-    def __init__(self, params) -> None:
+    def __init__(self, params: object) -> None:
         """params: 入力パラメータ"""
+
         self.params = params
 
         # インジェクション攻撃防止のため判定処理をする
@@ -21,65 +23,95 @@ class Transaction:
             # 動作確認対象外
             self.network_arg = "-mainnet"
         else:
-            raise RuntimeError('Error: "network" parameter is invalid')
+            raise RuntimeError(
+                'Error: "network" parameter is invalid, ' + params["network"]
+                )
 
-    def __run_shell_command(self, command) -> str:
+    def __run_shell_command(self, command_elements: list[str]) -> str:
         """コマンドを実行し、標準出力結果を返す"""
 
-        try:
-            result = subprocess.run(
-                command,
-                shell=True,  # TODO: インジェクション攻撃防止のためfalseにする
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-        except Exception:
-            # TODO: 引数にerr_messageを追加し、以下のメッセージに表示する
-            raise RuntimeError("Error, command execution failed, " + command)
+        result = subprocess.run(
+            command_elements,
+            capture_output=True,
+            text=True,
+        )
+
+        if 0 != result.returncode:
+            sys.stderr.write(result.stderr)
+            raise RuntimeError(
+                "Error, command failed, " + " ".join(command_elements)
+                )
 
         return result.stdout
 
-    def __run_shell_command_json(self, command) -> str:
+    def __run_shell_command_json(self, command_elements: list[str]) -> str:
         """コマンドを実行し、標準出力結果をjson形式で返す"""
 
-        result = self.__run_shell_command(command)
+        result = self.__run_shell_command(command_elements)
         return json.loads(result)
 
-    def create_raw_tx(self) -> str:
-        """送金用のRaw Transactionを作成する"""
-
-        inputs = [self.params["unspent_tx"]]
-        outputs = {self.params["dest_address"]: self.params["amount"]}
-
-        cmd_createrawtransaction = (
-            "bitcoin-cli "
-            + self.network_arg
-            + " createrawtransaction '"
-            + json.dumps(inputs)
-            + "' '"
-            + json.dumps(outputs)
-            + "'"
+    def __modify_float_notation_for_json(
+            self, num: float, digits: int = 8
+            ) -> object:
+        '''
+        json dump後の小数点以下の浮動小数点表記を、指定桁に丸める
+        - 浮動小数点をjson dumpすると、誤差により小数点の桁数が大きくなる問題の修正
+        ex) digits=8のとき、12.12345678999 -> 12.12345679(y:8桁)
+        '''
+        modified_num = json.loads(
+            json.dumps(num),
+            parse_float=lambda x: round(float(x), digits)
         )
+
+        return modified_num
+
+    def create_raw_tx(self) -> str:
+        """送金用の未署名Raw Transactionを作成する"""
+
+        tx_inputs = [
+            {
+                "txid": self.params["unspent_transaction"]["txid"],
+                "vout": self.params["unspent_transaction"]["vout"]
+            }
+        ]
+
+        remittance_amount = self.params["remittance_amount"]
+        charge = self.params["unspent_transaction"]["amount"] \
+            - remittance_amount - self.params["transaction_fee"]
+        charge = self.__modify_float_notation_for_json(charge)
+
+        tx_outputs = {
+            self.params["address"]["destination"]: remittance_amount,
+            self.params["address"]["sender_charge"]: charge
+        }
+
+        cmd_createrawtransaction = [
+            "bitcoin-cli",
+            self.network_arg,
+            "createrawtransaction",
+            json.dumps(tx_inputs),
+            json.dumps(tx_outputs)
+        ]
 
         raw_tx = self.__run_shell_command(cmd_createrawtransaction)
         raw_tx = raw_tx.replace("\n", "")
 
         return raw_tx
 
-    def sign_raw_tx_with_wallet(self, raw_tx) -> object:
+    def sign_raw_tx_with_wallet(self, raw_tx: str) -> str:
         """
         walletを使用してRaw Transactionに署名する
         前提としてwalletがloadされていること
         """
 
-        cmd = (
-            "bitcoin-cli "
-            + self.network_arg
-            + " signrawtransactionwithwallet "
-            + raw_tx
-        )
-        signed_result = self.__run_shell_command_json(cmd)
+        signe_cmd = [
+            "bitcoin-cli",
+            self.network_arg,
+            "signrawtransactionwithwallet",
+            raw_tx
+            ]
+
+        signed_result = self.__run_shell_command_json(signe_cmd)
         if signed_result["complete"] is not True:
             raise RuntimeError("Error, sign raw_tx failed")
 
