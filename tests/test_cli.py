@@ -73,7 +73,7 @@ class TestCheckParams:
                 "unspent_transaction": {
                     "txid": "09af",
                     "vout": 0,
-                    "value": 0
+                    "amount": 0
                 },
                 "address": {
                     "destination": "azAZ09",

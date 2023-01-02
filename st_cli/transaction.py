@@ -76,7 +76,7 @@ class Transaction:
         ]
 
         remittance_amount = self.params["remittance_amount"]
-        charge = self.params["unspent_transaction"]["value"] \
+        charge = self.params["unspent_transaction"]["amount"] \
             - remittance_amount - self.params["transaction_fee"]
         charge = self.__modify_float_notation_for_json(charge)
 

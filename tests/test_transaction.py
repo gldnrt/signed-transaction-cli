@@ -30,7 +30,7 @@ class TestTransaction:
     def __create_default_params(self) -> object:
         '''
         デフォルトの試験用入力パラメータを作成
-        前提: listunspent[0]に十分な(fee以上の)valueがあること
+        前提: listunspent[0]に十分な(fee以上の)amountがあること
         '''
 
         cmd = 'bitcoin-cli -regtest getnewaddress "Dest Address"'
@@ -55,7 +55,7 @@ class TestTransaction:
             "unspent_transaction": {
                 "txid": target_utx["txid"],
                 "vout": target_utx["vout"],
-                "value": target_utx["amount"]
+                "amount": target_utx["amount"]
                 },
             "address": {
                 "destination": dest_address,
@@ -135,7 +135,7 @@ class TestTransaction:
         assert decoded_raw_tx["vout"][0]["scriptPubKey"]["address"]\
             == params["address"]["destination"]
         assert decoded_raw_tx["vout"][1]["value"]\
-            == (params["unspent_transaction"]["value"]
+            == (params["unspent_transaction"]["amount"]
                 - params["remittance_amount"]
                 - params["transaction_fee"])
         assert decoded_raw_tx["vout"][1]["scriptPubKey"]["address"]\
