@@ -1,0 +1,14 @@
+{
+    "network": "regtest",
+    "remittance_amount": -0.00008047,
+    "transaction_fee": 0.00001,
+    "specified_utxo": {
+        "txid": "81e0c94f6f0bf1d303a7ffc6f9f66102bb55980e74a44ea5e27b061bbc844bbe",
+        "vout": 0,
+        "amount": 0.2
+    },
+    "address": {
+        "destination": "bcrt1qem508a5wudkwuc2a0pwtk5y5ldzzlzzhy7tpn2",
+        "sender_charge": "bcrt1qftf35me939pfkww30plxe8yr0kcvu9wa906920"
+    }
+}
