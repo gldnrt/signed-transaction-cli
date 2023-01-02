@@ -127,9 +127,9 @@ class TestTransaction:
         assert decoded_raw_tx["vout"][0]["scriptPubKey"]["address"]\
             == params["address"]["destination"]
         assert decoded_raw_tx["vout"][1]["value"]\
-            == (params["specified_utxo"]["amount"]
-                - params["remittance_amount"]
-                - params["transaction_fee"])
+            == pytest.approx(params["specified_utxo"]["amount"]
+               - params["remittance_amount"]
+               - params["transaction_fee"])
         assert decoded_raw_tx["vout"][1]["scriptPubKey"]["address"]\
             == params["address"]["sender_charge"]
 
