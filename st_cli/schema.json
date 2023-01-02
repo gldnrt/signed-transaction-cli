@@ -1,0 +1,86 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "title": "Input Param Schema",
+    "required": [
+        "network",
+        "remittance_amount",
+        "transaction_fee",
+        "unspent_transaction",
+        "address"
+    ],
+    "properties": {
+        "network": {
+            "type": "string",
+            "enum": [
+                "regtest",
+                "testnet",
+                "mainnet"
+            ]
+        },
+        "remittance_amount": {
+            "type": "number",
+            "minimum": 0
+        },
+        "transaction_fee": {
+            "type": "number",
+            "minimum": 0
+        },
+        "unspent_transaction": {
+            "type": "object",
+            "required": [
+                "txid",
+                "vout",
+                "value"
+            ],
+            "properties": {
+                "txid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]+$"
+                },
+                "vout": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "value": {
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "address": {
+            "type": "object",
+            "required": [
+                "destination",
+                "sender_charge"
+            ],
+            "properties": {
+                "destination": {
+                    "type": "string",
+                    "pattern": "^[0-9a-zA-Z]+$"
+                },
+                "sender_charge": {
+                    "type": "string",
+                    "pattern": "^[0-9a-zA-Z]+$"
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "network": "regtest",
+            "remittance_amount": 0.00008047,
+            "transaction_fee": 0.00001,
+            "unspent_transaction": {
+                "txid": "81e0c94f6f0bf1d303a7ffc6f9f66102bb55980e74a44ea5e27b061bbc844bbe",
+                "vout": 0,
+                "value": 0.2
+            },
+            "address": {
+                "destination": "bcrt1qem508a5wudkwuc2a0pwtk5y5ldzzlzzhy7tpn2",
+                "sender_charge": "bcrt1qftf35me939pfkww30plxe8yr0kcvu9wa906920"
+            }
+        }
+    ]
+}
