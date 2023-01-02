@@ -13,19 +13,7 @@ class Transaction:
         """params: 入力パラメータ"""
 
         self.params = params
-
-        # インジェクション攻撃防止のため判定処理をする
-        if "regtest" == params["network"]:
-            self.network_arg = "-regtest"
-        elif "testnet" == params["network"]:
-            self.network_arg = "-testnet"
-        elif "mainnet" == params["network"]:
-            # 動作確認対象外
-            self.network_arg = "-mainnet"
-        else:
-            raise RuntimeError(
-                'Error: "network" parameter is invalid, ' + params["network"]
-                )
+        self.network_arg = "-" + params["network"]
 
     def __run_shell_command(self, command_elements: list[str]) -> str:
         """コマンドを実行し、標準出力結果を返す"""

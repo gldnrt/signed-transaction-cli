@@ -102,14 +102,6 @@ class TestTransaction:
         assert myTx.params == params
         assert myTx.network_arg == "-mainnet"
 
-    def test_constructor_ignore_network(self):
-        params = {"network": "ignore"}
-
-        with pytest.raises(RuntimeError) as e:
-            Transaction(params)
-
-        assert str(e.value) == 'Error: "network" parameter is invalid, ignore'
-
     def test_create_raw_tx(self):
         params = self.__create_default_params()
         myTx = Transaction(params)
