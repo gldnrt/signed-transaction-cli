@@ -9,14 +9,18 @@ class Transaction:
     params = None
     network_arg = "-unspecified-network"
 
-    def __init__(self, params: object) -> None:
+    def __init__(self, params: dict) -> None:
         """params: 入力パラメータ"""
 
         self.params = params
         self.network_arg = "-" + params["network"]
 
-    def __run_shell_command(self, command_elements: list[str]) -> str:
-        """コマンドを実行し、標準出力結果を返す"""
+    def __run_shell_command(self, command_elements: list[str], summary) -> str:
+        """
+        コマンドを実行し、標準出力結果を返す
+        command_elements: コマンドと引数の要素をリストにしたもの(ex. ["ls" "-a"])
+        summary: コマンドの概要。エラーメッセージに使用する
+        """
 
         result = subprocess.run(
             command_elements,
@@ -27,15 +31,20 @@ class Transaction:
         if 0 != result.returncode:
             sys.stderr.write(result.stderr)
             raise RuntimeError(
-                "Error, command failed, " + " ".join(command_elements)
+                "Error, failed " + summary + ", " + " ".join(command_elements)
                 )
 
         return result.stdout
 
-    def __run_shell_command_json(self, command_elements: list[str]) -> str:
-        """コマンドを実行し、標準出力結果をjson形式で返す"""
+    def __run_shell_command_json(self, command_elements: list[str], summary)\
+            -> str:
+        """
+        コマンドを実行し、標準出力結果をjson形式で返す
+        command_elements: コマンドと引数の要素をリストにしたもの(ex. ["ls" "-a"])
+        summary: コマンドの概要。エラーメッセージに使用する
+        """
 
-        result = self.__run_shell_command(command_elements)
+        result = self.__run_shell_command(command_elements, summary)
         return json.loads(result)
 
     def __modify_float_notation_for_json(
@@ -44,7 +53,7 @@ class Transaction:
         '''
         json dump後の小数点以下の浮動小数点表記を、指定桁に丸める
         - 浮動小数点をjson dumpすると、誤差により小数点の桁数が大きくなる問題の修正
-        ex) digits=8のとき、12.12345678999 -> 12.12345679(y:8桁)
+        ex) digits=8のとき、num=12.12345678999 -> 12.12345679(y:8桁)
         '''
         modified_num = json.loads(
             json.dumps(num),
@@ -81,7 +90,8 @@ class Transaction:
             json.dumps(tx_outputs)
         ]
 
-        raw_tx = self.__run_shell_command(cmd_createrawtransaction)
+        summary = "create raw transaction"
+        raw_tx = self.__run_shell_command(cmd_createrawtransaction, summary)
         raw_tx = raw_tx.replace("\n", "")
 
         return raw_tx
@@ -99,9 +109,10 @@ class Transaction:
             raw_tx
             ]
 
-        signed_result = self.__run_shell_command_json(signe_cmd)
+        summary = "sign raw transaction"
+        signed_result = self.__run_shell_command_json(signe_cmd, summary)
         if signed_result["complete"] is not True:
-            raise RuntimeError("Error, sign raw_tx failed")
+            raise RuntimeError("Error, sign raw transaction is not complete")
 
         return signed_result["hex"]
 
