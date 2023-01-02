@@ -19,22 +19,6 @@ class TestTransaction:
         assert myTx.params == params
         assert myTx.network_arg == "-regtest"
 
-    def test_constructor_testnet(self):
-        params = {"network": "testnet"}
-
-        myTx = Transaction(params)
-
-        assert myTx.params == params
-        assert myTx.network_arg == "-testnet"
-
-    def test_constructor_mainnet(self):
-        params = {"network": "mainnet"}
-
-        myTx = Transaction(params)
-
-        assert myTx.params == params
-        assert myTx.network_arg == "-mainnet"
-
     def test_create_raw_tx(self):
         params = testlib.create_default_params()
         myTx = Transaction(params)

@@ -4,6 +4,7 @@ from st_cli.params import \
 
 
 class TestReadParamsFromFile:
+    '''params.read_params_from_file()のテストクラス'''
 
     def test_read_params(self):
         param_file_path = "./tests/test_params/test_params.json"
@@ -55,6 +56,13 @@ class TestCheckParams:
     def test_check_params(self):
         params = self.create_default_params()
         check_params(params)
+
+    '''
+    下記の内、異常値となる文字列を検出できることをテストする
+    数値: 整数、浮動小数点、schcema定義範囲外の数値
+    文字列: [0-9]+、[0-9a-z]+,[0-9a-zA-Z]+、記号を含む文字列、
+            正常文字と以上文字の組み合わせ
+    '''
 
     @pytest.mark.parametrize("network", ["regtest", "testnet", "mainnet"])
     def test_check_params_network(self, network):
