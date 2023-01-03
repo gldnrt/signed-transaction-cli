@@ -2,8 +2,9 @@
 
 ## 概要
 
-Bitcoinの署名済み送金用トランザクションを作成するCLIアプリケーション  
-オフライン環境で実行可能
+Bitcoinの署名済み送金用トランザクションを作成するアプリケーション  
+* CLI
+* オフライン環境で実行可能
 
 ## 実行環境
 
@@ -11,8 +12,8 @@ Bitcoinの署名済み送金用トランザクションを作成するCLIアプ�
 
 |  OS/ライブラリ  |  動作確認バージョン  |
 | ---- | ---- |
-|  Linux  |  Ubuntu22.04.1LTS  |
-|  bitcoin core  |  v24.0.1  |
+|  Linux  |  WSL2 + Ubuntu22.04.1LTS  |
+|  Bitcoin Core  |  v24.0.1  |
 |  Python  |  3.10.6  |
 |  Poetry  |  1.3.1  |
 
@@ -50,7 +51,7 @@ $ poetry intall
 
 ## 実行
 
-walletがロードされている状態で、以下を実行する
+bitcoindの起動およびwalletがロードされている状態で、以下を実行する
 
 ```
 $ python3 -m st_cli [PARAM_FILE_PATH]
@@ -87,5 +88,5 @@ e666248e6f84d8c4c39652695d09a52d5f988ed1862de5d0db6845068ca4ee17e666248e6f84d8c4
 `signed-transaction-cli`ディレクトリで、以下を実行する
 
 ```
-$ pytest
+$ poetry run pytest
 ```
