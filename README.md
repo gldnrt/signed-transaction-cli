@@ -90,3 +90,23 @@ e666248e6f84d8c4c39652695d09a52d5f988ed1862de5d0db6845068ca4ee17e666248e6f84d8c4
 ```
 $ poetry run pytest
 ```
+
+### Docker環境でのテスト
+
+* Dockerファイル
+
+[tests/docker/Dockerfile](./tests/docker/Dockerfile)
+
+* テスト実行例
+
+```
+## コンテナ作成&起動
+$ docker build -t st_cli_image ./tests/docker/
+$ docker run --name st_cli_test -d st_cli_image
+
+## wallet作成&ロード
+$ docker exec -it st_cli_test bitcoin-cli createwallet testwallet
+
+## テスト実行
+$ docker exec -it st_cli_test poetry run pytest
+```
