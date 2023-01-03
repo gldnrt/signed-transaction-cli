@@ -27,7 +27,7 @@ def cli_main(argv: list[str]) -> None:
     """create_signed_transactionの実行およびエラー処理"""
 
     try:
-        create_signed_transaction(sys.argv)
+        create_signed_transaction(argv)
     except Exception as e:
         print(e, file=sys.stderr)
         exit(1)
