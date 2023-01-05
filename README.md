@@ -85,6 +85,11 @@ e666248e6f84d8c4c39652695d09a52d5f988ed1862de5d0db6845068ca4ee17e666248e6f84d8c4
 
 ## テスト
 
+テストの前提条件として、以下が必要
+
+* regtestモードでbitcoindが動作していること
+* walletがロードされていること
+
 `signed-transaction-cli`ディレクトリで、以下を実行する
 
 ```
