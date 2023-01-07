@@ -2,7 +2,7 @@ import pytest
 from . import testlib
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def create_coin():
     '''
     送金用コイン作成

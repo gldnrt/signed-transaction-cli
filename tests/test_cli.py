@@ -105,7 +105,7 @@ class TestCliMain:
 
     def test_check_input_file_schema(self, capfd):
         params = testlib.create_default_params()
-        params['remittance_amount'] = -0.1
+        params["remittance_amount"] = -0.1
 
         testlib.create_input_file(params)
 
@@ -122,7 +122,7 @@ class TestCliMain:
 
     def test_ignore_txid(self, capfd):
         params = testlib.create_default_params()
-        params['specified_utxo']['txid'] = "0" * 64
+        params["specified_utxo"]["txid"] = "0" * 64
 
         testlib.create_input_file(params)
 
@@ -178,7 +178,7 @@ class TestCreateSignedTransaction:
             cli.create_signed_transaction(["./st_cli/__main__.py"])
 
     def test_calling_get_params_with_error(self, capfd):
-        self.params['network'] = "ignore"
+        self.params["network"] = "ignore"
         testlib.create_input_file(self.params)
 
         with pytest.raises(RuntimeError) as e:
@@ -187,7 +187,7 @@ class TestCreateSignedTransaction:
         assert str(e.value).startswith("Error: ignore params file, ")
 
     def test_calling_create_signed_tx_with_error(self, capfd):
-        self.params['specified_utxo']['txid'] = "000000000"
+        self.params["specified_utxo"]["txid"] = "000000000"
         testlib.create_input_file(self.params)
 
         with pytest.raises(RuntimeError) as e:
