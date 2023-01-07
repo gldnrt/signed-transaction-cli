@@ -74,7 +74,7 @@ def get_default_input_file_path():
 def create_input_file(params: dict, path: str = get_default_input_file_path()):
     '''paramsをファイル出力する'''
 
-    with open(path, 'w') as fout:
+    with open(path, "w") as fout:
         json.dump(params, fout, indent=2)
 
     os.sync()

@@ -52,7 +52,7 @@ class TestTransaction:
 
     def test_create_raw_tx_ignore_param(self):
         params = testlib.create_default_params()
-        params['specified_utxo']['txid'] = 'ignore_txid'
+        params["specified_utxo"]["txid"] = "ignore_txid"
         myTx = Transaction(params)
 
         with pytest.raises(RuntimeError):

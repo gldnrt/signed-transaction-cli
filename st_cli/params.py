@@ -7,7 +7,7 @@ def check_params(params: dict) -> None:
     '''入力paramがスキーマに即しているかを確認する'''
 
     parentdir = os.path.dirname(__file__)
-    schema_file_path = parentdir + '/schema.json'
+    schema_file_path = parentdir + "/schema.json"
 
     with open(schema_file_path) as file_obj:
         json_schema = json.load(file_obj)
